@@ -1,0 +1,81 @@
+lst = []
+n = int(input("Enter the number of students : "))
+for i in range(n):
+    t = (input("Enter the name : "),int(input("Enter mobile no. : ")))
+    lst.append(t)
+print(lst)  
+
+
+
+
+def sort(lst):
+    for i in range(len(lst)-1,0,-1):
+        for j in range(i):
+            if (lst[j][0] > lst[j+1][0]):
+                temp = lst[j]
+                lst[j] = lst[j+1]
+                lst[j+1] = temp
+    print(lst)
+sort(lst)
+
+
+
+
+key = input("Enter the name of student you need to find : ")
+
+
+def searc(lst, key):
+    low = 0
+    high = len(lst)-1
+    
+    while(low<=high):
+        mid = int((low+high)/2)
+        if (key == lst[mid][0]):
+            return (mid+1)
+            break
+        elif(key < lst[mid][0]):
+            high = mid-1
+        else:
+            low = mid+1
+            
+x = searc(lst, key)
+if(x == None):
+    print("Element not present in the given data , add the element")
+    print("enter the Name : ",key)
+    t = (key,int(input("Enter mobile no. : ")))
+    lst.append(t)
+    sort(lst)
+else:
+    print("Element present in the given data")
+print(x)
+
+
+
+key = input("Enter the name of student you need to find : ")
+
+
+
+low = 0
+high = (len(lst)-1)
+
+def rec(lst, key, low, high):
+    if(low > high):
+        return -1
+    mid = int((low+high)/2)
+    if(key == lst[mid][0]):
+        return mid
+    elif(key > lst[mid][0]):
+        return rec(lst, key, mid+1, high)
+    else:
+        return rec(lst, key, low, mid-1)
+x = rec(lst, key, low, high)
+if(x == -1):
+    print("Element not present in the given data , add the element")
+    print("Enter the name : ",key)
+    t = (key,int(input("Enter mobile no. : ")))
+    lst.append(t)
+    sort(lst)
+else:
+    print("Element present in the given data")
+	
+	

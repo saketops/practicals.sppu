@@ -1,0 +1,52 @@
+def intersection(A,B):
+    D={}
+    D=list(D)
+    for student in A:
+        if student in B:
+            D.append(student)
+    return D
+
+
+def union(A,B):
+    D=B.copy()
+    D=list(D)
+    for student in A:
+        if not student in B:
+            D.append(student)
+    return D
+
+
+def difference(A,B):
+    D={}
+    D=list(D)
+    for student in A:
+        if not student in B:
+            D.append(student)
+    return D
+
+
+A={"riya" ,"Reema" , "ram" , "piyu" , "chinu" , "manu"}
+B={"khushi" , "Rishi" , "piyu" , "manu"}
+C={"Juli" , "champa" , "ram" , "chinu"}
+
+
+A=list(A)
+B=list(B)
+C=list(C)
+
+print(intersection(A,B))
+
+o/p 
+['manu', 'piyu']
+
+print(difference(union(A,B),intersection(A,B)))
+
+o/p 
+
+['khushi', 'Rishi', 'chinu', 'riya', 'ram', 'Reema']
+
+print(len(difference(C,union(A,B))))
+
+o/p 
+
+2
