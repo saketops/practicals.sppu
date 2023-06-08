@@ -1,0 +1,1680 @@
+/*C++ Program To read details of a book consists of chapters,
+ *chapters consist of sections and sections consist of
+ *subsections. Construct a tree and print the nodes.
+ *Find the time and space requirements of your method.
+ **/
+ #include <iostream>
+#include <string.h>
+using namespace std;
+
+struct node // Node Declaration
+{
+    string label;
+    //char label[10];
+    int ch_count;
+    struct node *child[10];
+} * root;
+
+class GT // Class Declaration
+{
+public:
+    void create_tree();
+    void display(node *r1);
+
+    GT()
+    {
+        root = NULL;
+    }
+};
+
+void GT::create_tree()
+{
+    int tbooks, tchapters, i, j, k;
+    root = new node;
+    cout << "Enter name of book : ";
+    cin.get();
+    getline(cin, root->label);
+    cout << "Enter number of chapters in book : ";
+    cin >> tchapters;
+    root->ch_count = tchapters;
+    for (i = 0; i < tchapters; i++)
+    {
+        root->child[i] = new node;
+        cout << "Enter the name of Chapter " << i + 1 << " : ";
+        cin.get();
+        getline(cin, root->child[i]->label);
+        cout << "Enter number of sections in Chapter : " << root->child[i]->label << " : ";
+        cin >> root->child[i]->ch_count;
+        for (j = 0; j < root->child[i]->ch_count; j++)
+        {
+            root->child[i]->child[j] = new node;
+            cout << "Enter Name of Section " << j + 1 << " : ";
+            cin.get();
+            getline(cin, root->child[i]->child[j]->label);
+        }
+    }
+}
+
+void GT::display(node *r1)
+{
+    int i, j, k, tchapters;
+    if (r1 != NULL)
+    {
+        cout << "\n-----Book Hierarchy---";
+        cout << "\n Book title : " << r1->label;
+        tchapters = r1->ch_count;
+        for (i = 0; i < tchapters; i++)
+        {
+
+            cout << "\nChapter " << i + 1;
+            cout << " : " << r1->child[i]->label;
+            cout << "\nSections : ";
+            for (j = 0; j < r1->child[i]->ch_count; j++)
+            {
+                cout << "\n"<< r1->child[i]->child[j]->label;
+            }
+        }
+    }
+    cout << endl;
+}
+
+int main()
+{
+    int choice;
+    GT gt;
+    while (1)
+    {
+        cout << "-----------------" << endl;
+        cout << "Book Tree Creation" << endl;
+        cout << "-----------------" << endl;
+        cout << "1.Create" << endl;
+        cout << "2.Display" << endl;
+        cout << "3.Quit" << endl;
+        cout << "Enter your choice : ";
+        cin >> choice;
+        switch (choice)
+        {
+        case 1:
+            gt.create_tree();
+        case 2:
+            gt.display(root);
+            break;
+        case 3:
+            cout << "Thanks for using this program!!!";
+            exit(1);
+        default:
+            cout << "Wrong choice!!!" << endl;
+        }
+    }
+    return 0;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+PRACTICAL 2-------------------------
+/*Expression Tree
+Construct an expression tree from the given prefix and traverse it using
+post order traversal and then delete the entire tree.*/
+
+
+#include <iostream>
+#include <string.h>
+using namespace std;
+
+struct node
+{
+    char data;
+    node *left;
+    node *right;
+};
+class tree
+{
+    char prefix[20];
+
+public:
+    node *top;
+    void expression(char[]);
+    void display(node *);
+    void non_rec_postorder(node *);
+    void del(node *);
+};
+class stack1
+{
+    node *data[30];
+    int top;
+
+public:
+    stack1()
+    {
+        top = -1;
+    }
+    int empty()
+    {
+        if (top == -1)
+            return 1;
+        return 0;
+    }
+    void push(node *p)
+    {
+        data[++top] = p;
+    }
+    node *pop()
+    {
+        return (data[top--]);
+    }
+};
+void tree::expression(char prefix[])
+{
+    char c;
+    stack1 s;
+    node *t1, *t2;
+    int len, i;
+    len = strlen(prefix);
+    for (i = len - 1; i >= 0; i--)
+    {
+        top = new node;
+        top->left = NULL;
+        top->right = NULL;
+        if (isalpha(prefix[i]))
+        {
+            top->data = prefix[i];
+            s.push(top);
+        }
+        else if (prefix[i] == '+' || prefix[i] == '*' || prefix[i] == '-' || prefix[i] == '/')
+        {
+            t2 = s.pop();
+            t1 = s.pop();
+            top->data = prefix[i];
+            top->left = t2;
+            top->right = t1;
+            s.push(top);
+        }
+    }
+    top = s.pop();
+}
+void tree::display(node *root)
+{
+    if (root != NULL)
+    {
+        cout << root->data;
+        display(root->left);
+        display(root->right);
+    }
+}
+void tree::non_rec_postorder(node *top)
+{
+    stack1 s1, s2; /*stack s1 is being used for flag . A NULL data implies that the right subtree has not been visited */
+    node *T = top;
+    cout << "\n";
+    s1.push(T);
+    while (!s1.empty())
+    {
+        T = s1.pop();
+        s2.push(T);
+        if (T->left != NULL)
+            s1.push(T->left);
+        if (T->right != NULL)
+            s1.push(T->right);
+    }
+    while (!s2.empty())
+    {
+        top = s2.pop();
+        cout << top->data;
+    }
+}
+void tree::del(node *node)
+{
+    if (node == NULL)
+        return;
+    /* first delete both subtrees */
+    del(node->left);
+    del(node->right);
+    /* then delete the node */
+    cout <<endl<<"Deleting node : " << node->data<<endl;
+    free(node);
+}
+int main()
+{
+    char expr[20];
+    tree t;
+
+    cout <<"Enter prefix Expression : ";
+    cin >> expr;
+    cout << expr;
+    t.expression(expr);
+    //t.display(t.top);
+    //cout<<endl;
+    t.non_rec_postorder(t.top);
+    t.del(t.top);
+    // t.display(t.top);
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+PRACTICAL 3===========
+/*
+Experiment 3 : Represent a given grapg using adjacency matrix/list to perform DFS and using adjacency list to perform BFS. 
+                Use the map of the area around the college as a graph. Identify the prominent land marks as nodes and perform DFS and BFS on that.
+Adjacency Matrix : using adj matrix -BFS(Que)
+*/
+
+#include <iostream>
+#include <stdlib.h>
+using namespace std;
+int cost[10][10], i, j, k, n, qu[10], front, rear, v, visit[10], visited[10];
+int stk[10], top, visit1[10], visited1[10];
+int main()
+{
+    int m;
+    cout << "Enter number of vertices : ";
+    cin >> n;
+    cout << "Enter number of edges : ";
+    cin >> m;
+    
+    cout << "\nEDGES :\n";
+    for (k = 1; k <= m; k++)
+    {
+        cin >> i >> j;
+        cost[i][j] = 1;
+        cost[j][i] = 1;
+    }
+    
+    //display function
+    cout << "The adjacency matrix of the graph is : " << endl;
+    for (i = 0; i < n; i++)
+    {
+        for (j = 0; j < n; j++)
+        {
+            cout << " " << cost[i][j];
+        }
+        cout << endl;
+    }
+    
+    cout << "Enter initial vertex : ";
+    cin >> v;
+    cout << "The BFS of the Graph is\n";
+    cout << v<<endl;
+    visited[v] = 1;
+    k = 1;
+    while (k < n)
+    {
+        for (j = 1; j <= n; j++)
+            if (cost[v][j] != 0 && visited[j] != 1 && visit[j] != 1)
+            {
+                visit[j] = 1;
+                qu[rear++] = j;
+            }
+        v = qu[front++];
+        cout << v << " ";
+        k++;
+        visit[v] = 0;
+        visited[v] = 1;
+    }
+    
+    cout <<endl<<"Enter initial vertex : ";
+    cin >> v;
+    cout << "The DFS of the Graph is\n";
+    cout << v<<endl;
+    visited[v] = 1;
+    k = 1;
+    while (k < n)
+    {
+        for (j = n; j >= 1; j--)
+            if (cost[v][j] != 0 && visited1[j] != 1 && visit1[j] != 1)
+            {
+                visit1[j] = 1;
+                stk[top] = j;
+                top++;
+            }
+        v = stk[--top];
+        cout << v << " ";
+        k++;
+        visit1[v] = 0;
+        visited1[v] = 1;
+    }
+    return 0;
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+Experiment 4 : There are flight paths between cities. If there is a flight between City A and City B then there is an edge between the cities. 
+The cost of the edge can be the time that flight take to reach city B from A, or the amount of fuel used for the journey. Represent this as a graph.
+The node can be represented by the airport name or name of the city. Use adjacency list representation of the graph or use adjacency matrix representation of the graph.
+*/
+
+#include <iostream>
+#include <queue>
+using namespace std;
+int adj_mat[50][50] = {0, 0};
+int visited[50] = {0};
+void dfs(int s, int n, string arr[])
+{
+    visited[s] = 1;
+    cout << arr[s] << " ";
+    for (int i = 0; i < n; i++)
+    {
+        if (adj_mat[s][i] && !visited[i])
+            dfs(i, n, arr);
+    }
+}
+void bfs(int s, int n, string arr[])
+{
+    bool visited[n];
+    for (int i = 0; i < n; i++)
+        visited[i] = false;
+    int v;
+    queue<int> bfsq;
+    if (!visited[s])
+    {
+        cout << arr[s] << " ";
+        bfsq.push(s);
+        visited[s] = true;
+        while (!bfsq.empty())
+        {
+            v = bfsq.front();
+            for (int i = 0; i < n; i++)
+            {
+                if (adj_mat[v][i] && !visited[i])
+                {
+                    cout << arr[i] << " ";
+                    visited[i] = true;
+                    bfsq.push(i);
+                }
+            }
+            bfsq.pop();
+        }
+    }
+}
+int main()
+{
+    cout << "Enter no. of cities: ";
+    int n, u;
+    cin >> n;
+    string cities[n];
+    for (int i = 0; i < n; i++)
+    {
+        cout << "Enter city #" << i << " (Airport Code): ";
+        cin >> cities[i];
+    }
+    
+    cout << "\nYour cities are: " << endl;
+    for (int i = 0; i < n; i++)
+        cout << "city #" << i << ": " << cities[i] << endl;
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = i + 1; j < n; j++)
+        {
+            cout << "Enter distance between " << cities[i] << " and " << cities[j] << " : ";
+            cin >> adj_mat[i][j];
+            adj_mat[j][i] = adj_mat[i][j];
+        }
+    }
+    cout << endl;
+    for (int i = 0; i < n; i++)
+        cout << "\t" << cities[i] << "\t";
+    for (int i = 0; i < n; i++)
+    {
+        cout << "\n"
+             << cities[i];
+        for (int j = 0; j < n; j++)
+            cout << "\t" << adj_mat[i][j] << "\t";
+        cout << endl;
+    }
+    cout << "Enter Starting Vertex: ";
+    cin >> u;
+    cout << "DFS: ";
+    dfs(u, n, cities);
+    cout << endl;
+    cout << "BFS: ";
+    bfs(u, n, cities);
+    return 0;
+}
+
+/******OUTPUT*****
+ * Enter no. of cities: 3
+Enter city #0 (Airport Code): 1
+Enter city #1 (Airport Code): 2
+Enter city #2 (Airport Code): 3
+
+Your cities are: 
+city #0: 1
+city #1: 2
+city #2: 3
+Enter distance between 1 and 2 : 20
+Enter distance between 1 and 3 : 90
+Enter distance between 2 and 3 : 60
+
+        1               2               3
+1       0               20              90
+
+2       20              0               60
+
+3       90              60              0
+Enter Starting Vertex: 1
+DFS: 2 1 3 
+BFS: 2 1 3
+*/
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+practica  5
+
+/*Consider telephone book database of N clients. Make use of a hash table implementation to quickly
+look up client‘s telephone number*/
+#include<iostream>
+#include<cstring>
+#define max 10
+using namespace std;
+
+struct client
+{
+	long int iPhno;
+	char name[20];
+
+};//end of structure 	
+
+class hashtable
+{
+	client ht[max];
+	
+	public:
+		hashtable()	//constructor
+		{
+			for(int i=0;i<max;i++)
+			{
+				ht[i].iPhno=0;
+				
+			}
+		}		
+		void insert();
+		void display();
+		void search();
+		int hash(long int);
+};//end of class
+
+void hashtable::insert()
+{
+	client c;
+	int iPos;
+	char cAns;
+	do
+	{
+		cout<<"\n Enter Phone Number:";
+		cin>>c.iPhno;
+		cout<<"\nEnter name";
+		cin>>c.name;
+		iPos=hash(c.iPhno);
+	    
+		if(ht[iPos].iPhno==0)
+		{
+			ht[iPos]=c;
+		}
+		else
+		{
+			for(int i=iPos+1;i%max!=iPos;i++)
+			{
+				ht[i]=c;
+				break;
+			}
+		}
+		cout<<"\n Add More:";
+		cin>>cAns;
+	}while(cAns=='y' || cAns=='Y');	
+}//end  of insert
+
+int hashtable::hash(long int key)
+{
+	return(key%max);
+}//end of hash
+
+void hashtable::display()
+{
+	cout<<"------------------------------------";
+	cout<<"\nSrno\tPhone number\tName\n";
+	cout<<"------------------------------------\n";
+	for(int i=0;i<max;i++)
+	{
+		cout<<i<<"\t"<<ht[i].iPhno<<"\t"<<ht[i].name<<endl;
+	}
+	cout<<"------------------------------------\n";
+}//end of display
+
+void hashtable::search()
+{
+	int iFlag=0; 
+	string x;
+	cout<<"Enter Name to be searched:";
+	cin>>x;
+	for(int i=0;i<max;i++)
+	{
+		if(ht[i].name==x)
+		{
+			cout<<"\n Phone Number Found at position "<<i;
+			cout<<"\n"<<ht[i].iPhno;
+			iFlag=1;
+		}
+	}
+	if(iFlag==0)
+	cout<<"\n Phone Number Not Found";
+}//end of search
+
+
+int main()
+{
+	int y,s,iCh;
+	hashtable h;
+	do
+	{
+		cout<<"\n---------------LIST---------------\n";
+		cout<<"\n1.INSERT\n2.DISPLAY\n3.SEARCH\n4.EXIT\n\n";
+		cout<<"Enter your choice:";
+		cin>>iCh;
+		cout<<"\n";
+		
+		switch(iCh)
+		{
+			case 1://insert
+				h.insert();
+				cout<<"\n";
+				break;
+				
+			case 2://display
+				h.display();
+				cout<<"\n";
+				break;
+				
+			case 3://search					
+				h.search();
+				cout<<"\n";
+				break;
+				
+				
+			case 4://exit
+				break;
+		}//end of switch
+	}while(iCh!=4);//end of do							
+return 0;
+}
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+practical 6 =======
+Implement all the functions of a dictionary (ADT) using hashing.
+Data: Set of (key, value) pairs, Keys are mapped to values, Keys must be comparable, Keys must
+be unique
+Standard Operations: Insert (key, value), Find(key), Delete(key)
+
+
+#include<iostream>
+#include<cstring>
+#define max 10
+using namespace std;
+
+struct client
+{
+	char name[20];
+    char meaning[20];
+};//end of structure 	
+
+class hashtable
+{
+	client ht[max];
+	
+	public:
+		hashtable()	//constructor
+		{
+			for(int i=0;i<max;i++)
+			{
+				strcpy(ht[i].name,"");
+				strcpy(ht[i].meaning,"");
+				
+			}
+		}		
+		void insert();
+		void display();
+		void search();
+		int hash(char key[]);
+};//end of class
+
+void hashtable::insert()
+{
+	client c;
+	int iPos;
+	char cAns;
+	do
+	{
+		cout<<"\nEnter name: ";
+		cin>>c.name;
+		cout<<"\nEnter Meaning: ";
+		cin>>c.meaning;
+		iPos=hash(c.name);
+	    
+		if(ht[iPos].name==0)
+		{
+			ht[iPos]=c;
+		}
+		else
+		{
+			for(int i=iPos+1;i%max!=iPos;i++)
+			{
+				ht[i]=c;
+				break;
+			}
+		}
+		cout<<"\n Add More:(y/n)";
+		cin>>cAns;
+	}while(cAns=='y' || cAns=='Y');	
+}//end  of insert
+
+int hashtable::hash(char key[])
+{   
+    int loc=0;
+    int len=strlen(key);
+    for (int i=0;i<len;i++){
+        loc+=key[i];
+    }
+	return(loc%max);
+}//end of hash
+
+void hashtable::display()
+{
+	cout<<"------------------------------------";
+	cout<<"\nSrno\tName\tMeaning\n";
+	cout<<"------------------------------------\n";
+	for(int i=0;i<max;i++)
+	{
+		cout<<i<<"\t"<<ht[i].name<<"\t"<<ht[i].meaning<<endl;
+	}
+	cout<<"------------------------------------\n";
+}//end of display
+
+void hashtable::search()
+{
+	int iFlag=0; 
+	string x;
+	cout<<"Enter Name to be searched:";
+	cin>>x;
+	for(int i=0;i<max;i++)
+	{
+		if(ht[i].name==x)
+		{
+			cout<<"\n Meaning "<<i;
+			cout<<"\n"<<ht[i].meaning;
+			iFlag=1;
+		}
+	}
+	if(iFlag==0)
+	cout<<"\n Name Not Found";
+}//end of search
+
+
+int main()
+{
+	int y,s,iCh;
+	hashtable h;
+	do
+	{
+		cout<<"\n---------------LIST---------------\n";
+		cout<<"\n1.INSERT\n2.DISPLAY\n3.SEARCH\n4.EXIT\n\n";
+		cout<<"Enter your choice:";
+		cin>>iCh;
+		cout<<"\n";
+		
+		switch(iCh)
+		{
+			case 1://insert
+				h.insert();
+				cout<<"\n";
+				break;
+				
+			case 2://display
+				h.display();
+				cout<<"\n";
+				break;
+				
+			case 3://search					
+				h.search();
+				cout<<"\n";
+				break;
+				
+				
+			case 4://exit
+				break;
+		}//end of switch
+	}while(iCh!=4);//end of do							
+return 0;
+]
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+practical 77
+
+//Experiment no 7
+/*Given sequence k=k1<k2<....<kn of n sorted keys with a search probability pi for each key ki, 
+build the Binary search tree that has least search cost given the access probability for each key?*/
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+// Structure for each node in the binary search tree
+struct Node {
+    int key;
+    Node* left;
+    Node* right;
+};
+
+// Function to create a new node
+Node* createNode(int key) {
+    Node* newNode = new Node();
+    newNode->key = key;
+    newNode->left = nullptr;
+    newNode->right = nullptr;
+    return newNode;
+}
+
+// Function to build a binary search tree
+Node* buildBST(vector<int>& keys, vector<double>& probabilities, int start, int end) {
+    // Base case
+    if (start > end) {
+        return nullptr;
+    }
+
+    int minIndex = start;
+    double minProbability = probabilities[start];
+
+    // Find the key with minimum access probability
+    for (int i = start + 1; i <= end; i++) {
+        if (probabilities[i] < minProbability) {
+            minIndex = i;
+            minProbability = probabilities[i];
+        }
+    }
+
+    // Create a new node with the minimum probability key
+    Node* root = createNode(keys[minIndex]);
+
+    // Recursively build left and right subtrees
+    root->left = buildBST(keys, probabilities, start, minIndex - 1);
+    root->right = buildBST(keys, probabilities, minIndex + 1, end);
+
+    return root;
+}
+
+// Function to print the binary search tree in inorder traversal
+void inorderTraversal(Node* root) {
+    if (root == nullptr) {
+        return;
+    }
+
+    inorderTraversal(root->left);
+    cout << root->key << " ";
+    inorderTraversal(root->right);
+}
+
+int main() {
+    vector<int> keys = {1, 2, 3, 4, 5};
+    vector<double> probabilities = {0.2, 0.1, 0.3, 0.15, 0.25};
+
+    // Build the binary search tree
+    Node* root = buildBST(keys, probabilities, 0, keys.size() - 1);
+
+    // Print the binary search tree in inorder traversal
+    inorderTraversal(root);
+    cout << endl;
+
+    // Cleanup - free memory
+    // TODO: Implement a function to delete the tree nodes
+
+    return 0;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+practical 8 
+
+//Exp no 8
+//Dictionary stoes words and its meaning.Provide facility for adding new words ,deleting keywords and updating
+#include<iostream>
+using namespace std;
+
+class node
+{
+public:
+	string key;
+	string meaning;
+	node *left;
+	node *right;
+};
+
+class AVL
+{
+	node *root;
+        public:
+            	AVL()
+            	{
+            		root=NULL;
+            	}
+            	
+	            void create();
+	            node* insert(node *cur,node *temp);
+            	node* balance(node *temp);
+            	int dif(node *temp);
+            	int height(node *temp);
+            	int maximum(int a,int b);
+            	
+            	node* LL(node *par);
+            	node* RR(node *par);
+            	node* LR(node *par);
+            	node* RL(node *par);
+            	
+            	void ascending(node *temp);
+            	node* delete_n(node *root,string key1);
+            	void deleten();
+            	
+            	node* extractmin(node *t);
+                void descending(node *temp);
+                void display();
+                bool search(node *cur,string key1);
+                void search_value();
+};
+
+void AVL::create()
+{
+	char answer;
+	node *temp;
+	do
+	{
+		temp=new node();
+		cout<<"\n Enter the keyword:";
+		cin>>temp->key;
+		cout<<"\n Enter the meaning:";
+		cin>>temp->meaning;
+		temp->left=temp->right=NULL;
+
+			root=insert(root,temp);
+
+		cout<<"\n Do you want to add another word?(y/n)";
+		cin>>answer;
+	}
+	while(answer=='y'||answer=='Y');
+}
+
+
+node* AVL::insert(node *cur,node *temp)
+{
+	if(cur==NULL)
+	{
+		return temp;
+	}
+	if(temp->key<cur->key)
+	{
+		cur->left=insert(cur->left,temp);
+		cur=balance(cur);
+	}
+	else if(temp->key>cur->key)
+	{
+		cur->right=insert(cur->right,temp);
+		cur=balance(cur);
+	}
+	return cur;
+}
+
+node* AVL::balance(node *temp)
+{
+	int bal;
+	bal=dif(temp);
+	
+	if(bal>=2)
+	{
+		if(dif(temp->left)<0)
+			temp=LR(temp);
+		else
+			temp=LL(temp);
+	}
+	else if(bal<=-2)
+	{
+		if(dif(temp->right)<0)
+			temp=RR(temp);
+		else
+			temp=RL(temp);
+	}
+	return temp;
+}
+
+
+int AVL::dif(node *temp)
+{
+	int l,r;
+	l=height(temp->left);
+	r=height(temp->right);
+	return(l-r);
+}
+
+int AVL::height(node *temp)
+{
+	if(temp==NULL)
+		return(-1);
+	else
+		return(max(height(temp->left),height(temp->right))+1);
+}
+
+int AVL::maximum(int a,int b)
+{
+	if(a>b)
+		return a;
+	else
+		return b;
+}
+
+node* AVL::LL(node *par)
+{
+	node *temp,*temp1;
+	temp=par->left;
+	temp1=temp->right;
+	temp->right=par;
+	par->left=temp1;
+	return temp;
+}
+
+node* AVL::RR(node *par)
+{
+	node *temp,*temp1;
+	temp=par->right;
+	temp1=temp->left;
+	temp->left=par;
+	par->right=temp1;
+	return temp;
+}
+
+node* AVL::LR(node *par)
+{
+	par->left=RR(par->left);
+	return(LL(par));
+}
+
+node* AVL::RL(node *par)
+{
+	par->right=LL(par->right);
+	return(RR(par));
+}
+
+void AVL::ascending(node *temp)
+{
+        if(temp!=NULL)
+        {
+                ascending(temp->left);
+                cout<<"\n\t"<<temp->key<<" : "<<temp->meaning;
+                ascending(temp->right);
+        }
+}
+
+void AVL::descending(node *temp)
+{
+        if(temp!=NULL)
+        {
+                descending(temp->right);
+                cout<<"\n\t"<<temp->key<<" : "<<temp->meaning;
+                descending(temp->left);
+        }
+}
+
+
+void AVL::display()
+{
+        cout<<"\n The keywords in ascending order are : \n";
+        ascending(root);
+        cout<<"\n The keywords in descending order are : \n";
+        descending(root);
+}
+
+bool AVL::search(node *cur,string key1)
+{
+	if(cur)
+	{
+		if(cur->key==key1)
+			return true;
+		if(cur->key>key1)
+			return search(cur->left,key1);
+		else
+			return search(cur->right,key1);
+	}
+	return false;
+}
+
+void AVL::search_value()
+{
+	string key2;
+        cout<<"\n Enter the keyword you wish to search : ";
+        cin>>key2;
+        if(search(root,key2))
+                cout<<"\n The entered keyword is present in the AVL tree";
+        else
+                cout<<"\n The entered keyword is not present in the AVL tree";
+}
+
+
+node* AVL::delete_n(node* cur,string key1)
+{
+    if ( !cur)
+    	return cur;
+    if ( key1 < cur->key )
+        cur->left = delete_n(cur->left, key1);
+
+    else if( key1 > cur->key )
+        cur->right = delete_n(cur->right, key1);
+
+    else
+    {
+        node *l = cur->left;
+        node *r = cur->right;
+        delete cur;
+        if ( !r )
+        	return l;
+        node *m=r;
+        
+        while(m->left)
+        	m=m->left;
+        m->right = extractmin(r);
+        m->left = l;
+        return balance(m);
+    }
+    return balance(cur);
+}
+
+    node* AVL::extractmin(node *t)
+    {
+        if ( !t->left ) 
+        return t->right;
+        t->left = extractmin(t->left);
+        return balance(t);
+    }
+
+void AVL::deleten()
+{
+	string key;
+	cout<<"\n Enter the keyword to be deleted : ";
+	cin>>key;
+	root=delete_n(root,key);
+}
+
+int main()
+{
+  char c;
+  int ch;
+  AVL a;
+  do
+  {
+      cout<<"*********************************";
+	  cout<<"\n 1.Insert a keyword in AVL tree.";
+	  cout<<"\n 2.Display the AVL tree.";
+	  cout<<"\n 3.Search a keyword";
+	  cout<<"\n 4.Delete a keyword.";
+	  cout<<"\n Enter your choice : ";
+	  cin>>ch;
+	  switch(ch)
+	  {
+      	  case 1 : a.create();
+               break;
+      	  case 2 : a.display();
+               break;
+      	  case 3 : a.search_value();
+               break;
+      	  case 4 : a.deleten();
+               break;
+      	  default : cout<<"\n Wrong choice ! ";
+	  }
+	  cout<<"\n Do you want to continue? (y/n): ";
+	  cin>>c;
+  	  }
+  	  while(c=='y'||c=='Y');
+  return 0;
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+practical 9
+//Exp no 9
+//Read the marks obtained of student of second year in an online examination .find out min. & max. marks obtained.Use Heap Data Structure.
+
+#include<iostream>
+using namespace std;
+# define max 20
+class stud
+{
+int mks[max];
+public:
+    stud()
+    {
+    for(int i=0;i<max;i++)
+      mks[i]=0;
+    }
+    void insertheap(int tot);
+    void displayheap(int tot);
+    void showmax(int tot);
+    void showmin();
+};
+
+void  stud::insertheap(int tot)
+{
+ for(int i=1;i<=tot;i++)
+ {
+   cout<<"enter marks";
+   cin>>mks[i];
+    int j=i;
+    int par=j/2;
+    while(mks[j]<=mks[par] && j!=0)
+     {
+        int tmp = mks[j];
+        mks[j]=mks[par];
+        mks[par]=tmp;
+        j=par;
+        par=j/2;
+     }       
+ }
+}
+
+void stud::displayheap(int tot)
+{
+int i=1,space=6;
+cout<<endl;
+while(i<=tot)
+{
+    if(i==1 || i==2 || i==4 || i==8 || i==16)
+    {
+    cout<<endl<<endl;
+    for(int j=0;j<space;j++)
+         cout<<" ";
+    space-=2;   
+    }
+   cout<<" "<<mks[i];i++;
+         
+}
+}
+
+
+void stud::showmax(int tot)
+{
+int max1=mks[1];
+for(int i=2;i<=tot;i++)
+{
+ if(max1<mks[i])
+  max1= mks[i];
+}
+cout<<"Max marks:"<<max1;
+}
+
+void stud::showmin()
+{
+cout<<"Min marks:"<<mks[1];
+}
+
+int main()
+{
+int ch,cont,total,tmp;
+int n;
+stud s1;
+do
+{
+cout<<endl<<"Menu";
+cout<<endl<<"1.Read marks of the student ";
+cout<<endl<<"2.Display  Min heap";
+cout<<endl<<"3.Find Max Marks";
+cout<<endl<<"4.Find Min Marks";
+cout<<endl<<"Enter Choice";
+cin>>ch;
+switch(ch)
+{
+case 1:
+     cout<<"how many students";
+     cin>>total;
+    s1.insertheap(total);
+    break;
+case 2:
+    s1.displayheap(total);
+    break;
+case 3:    s1.showmax(total);
+    break;
+case 4:
+    s1.showmin();
+    break;
+}
+cout<<endl<<"do u want to continue?(1 for continue)";
+cin>>cont;
+}while(cont==1);
+return 0;
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+practical 10 
+
+
+/*Experiment No.10
+Department maintains a student information. The file contains roll number, name, division and address. Allow user to add, delete information of student. Display information of particular employee. If record of student does not exist an appropriate message is displayed. If it is, then the system displays the student details. Use sequential file to main the data.*/
+
+#include<iostream>
+#include<fstream>
+#include<cstring>
+using namespace std;
+class tel
+ {
+
+ public:
+ int rollNo,roll1;
+ char name[10];
+ char div;
+ char address[20];
+ void accept()
+ {
+  cout<<"\n\tEnter Roll Number : ";
+  cin>>rollNo;
+  cout<<"\n\tEnter the Name : ";
+  cin>>name;
+  cout<<"\n\tEnter the Division:";
+  cin>>div;
+  cout<<"\n\tEnter the Address:";
+  cin>>address;
+ }
+        void accept2()
+        {
+               cout<<"\n\tEnter the Roll No. to modify : ";
+               cin>>rollNo;
+        }
+        void accept3()
+        {
+              cout<<"\n\tEnter the name to modify : ";
+              cin>>name;
+        }
+        int getRollNo()
+        {
+         return rollNo;
+        }
+  void show()
+  {
+
+  cout<<"\n\t"<<rollNo<<"\t\t"<<name<<"\t\t"<<div<<"\t\t"<<address;
+  }
+};
+int main()
+{
+ int i,n,ch,ch1,rec,start,count,add,n1,add2,start2,n2,y,a,b,on,oname,add3,start3,n3,y1,add4,start4,n4;
+ char name[20],name2[20];
+ tel t1;
+ count=0;
+ fstream g,f;
+ do
+ {
+  cout<<"\n>>>>>>>>>>>>>>>>>>>>>>MENU<<<<<<<<<<<<<<<<<<<<";
+  cout<<"\n1.Insert and overwrite\n2.Show\n3.Search & Edit(number)\n4.Search & Edit(name)\n5.Search & Edit(onlynumber)\n6.Search & edit(only name)\n 7.Delete a Student Record\n 8.Exit\n\tEnter the Choice\t:";
+  cin>>ch;
+  switch(ch)
+  {
+  case 1:
+   f.open("StuRecord.txt",ios::out);
+   x:t1.accept();
+   f.write((char*) &t1,(sizeof(t1)));
+   cout<<"\nDo you want to enter more records?\n1.Yes\n2.No";
+   cin>>ch1;
+    if(ch1==1)
+     goto x;
+    else
+    {
+     f.close();
+     break;
+    }
+
+  case 2:
+   f.open("StuRecord.txt",ios::in);
+   f.read((char*) &t1,(sizeof(t1)));
+   //cout<<"\n\tRoll No.\t\tName \t\t Division \t\t Address";
+   while(f)
+   {
+    t1.show();
+    f.read((char*) &t1,(sizeof(t1)));
+   }
+   f.close();
+   break;
+  case 3:
+   cout<<"\nEnter the roll number you want to find";
+   cin>>rec;
+   f.open("StuRecord.txt",ios::in|ios::out);
+   f.read((char*)&t1,(sizeof(t1)));
+   while(f)
+   {
+    if(rec==t1.rollNo)
+    {
+     cout<<"\nRecord found";
+     add=f.tellg();
+     f.seekg(0,ios::beg);
+           start=f.tellg();
+     n1=(add-start)/(sizeof(t1));
+     f.seekp((n1-1)*sizeof(t1),ios::beg);
+     t1.accept();
+     f.write((char*) &t1,(sizeof(t1)));
+     f.close();
+     count++;
+     break;
+    }
+    f.read((char*)&t1,(sizeof(t1)));
+       }
+   if(count==0)
+          cout<<"\nRecord not found";
+   f.close();
+   break;
+
+  case 4:
+    cout<<"\nEnter the name you want to find and edit";
+    cin>>name;
+   f.open("StuRecord.txt",ios::in|ios::out);
+   f.read((char*)&t1,(sizeof(t1)));
+   while(f)
+   {
+    y=(strcmp(name,t1.name));
+    if(y==0)
+    {
+     cout<<"\nName found";
+     add2=f.tellg();
+     f.seekg(0,ios::beg);
+     start2=f.tellg();
+     n2=(add2-start2)/(sizeof(t1));
+     f.seekp((n2-1)*sizeof(t1),ios::beg);
+     t1.accept();
+     f.write((char*) &t1,(sizeof(t1)));
+     f.close();
+     break;
+    }
+          f.read((char*)&t1,(sizeof(t1)));
+   }
+   break;
+      case 5:
+            cout<<"\n\tEnter the roll number you want to modify";
+            cin>>on;
+            f.open("StuRecord.txt",ios::in|ios::out);
+            f.read((char*) &t1,(sizeof(t1)));
+            while(f)
+            {
+              if(on==t1.rollNo)
+              {
+                cout<<"\n\tNumber found";
+                add3=f.tellg();
+                f.seekg(0,ios::beg);
+                start3=f.tellg();
+                n3=(add3-start3)/(sizeof(t1));
+                f.seekp((n3-1)*(sizeof(t1)),ios::beg);
+                t1.accept2();
+                f.write((char*)&t1,(sizeof(t1)));
+                f.close();
+                break;
+              }
+              f.read((char*)&t1,(sizeof(t1)));
+           }
+           break;
+      case 6:
+            cout<<"\nEnter the name you want to find and edit";
+    cin>>name2;
+   f.open("StuRecord.txt",ios::in|ios::out);
+   f.read((char*)&t1,(sizeof(t1)));
+   while(f)
+   {
+    y1=(strcmp(name2,t1.name));
+    if(y1==0)
+    {
+     cout<<"\nName found";
+     add4=f.tellg();
+     f.seekg(0,ios::beg);
+     start4=f.tellg();
+     n4=(add4-start4)/(sizeof(t1));
+     f.seekp((n4-1)*sizeof(t1),ios::beg);
+     t1.accept3();
+     f.write((char*) &t1,(sizeof(t1)));
+     f.close();
+     break;
+    }
+          f.read((char*)&t1,(sizeof(t1)));
+   }
+   break;
+    case 7:
+      int roll;
+      cout<<"Please Enter the Roll No. of Student Whose Info You Want to Delete: ";
+     cin>>roll;
+     f.open("StuRecord.txt",ios::in);
+     g.open("temp.txt",ios::out);
+     f.read((char *)&t1,sizeof(t1));
+     while(!f.eof())
+     {
+        if (t1.getRollNo() != roll)
+           g.write((char *)&t1,sizeof(t1));
+         f.read((char *)&t1,sizeof(t1));
+     }
+    cout << "The record with the roll no. " << roll << " has been deleted " << endl;
+     f.close();
+     g.close();
+     remove("StuRecord.txt");
+     rename("temp.txt","StuRecord.txt");
+      break;
+    case 8:
+       cout<<"\n\tThank you";
+       break;
+
+
+        }
+  }while(ch!=8);
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+practical 11
+
+//Exp no 11
+//Implement heap sort algorithm using heap data struture Java programming
+
+
+import java.util.Arrays;
+
+class HeapShellSort {
+    public static void heapify(int[] arr, int n, int i) {
+        int largest = i; // Initialize largest as root
+        int left = 2 * i + 1; // Left child
+        int right = 2 * i + 2; // Right child
+
+        // If left child is larger than root
+        if (left < n && arr[left] > arr[largest])
+            largest = left;
+
+        // If right child is larger than largest so far
+        if (right < n && arr[right] > arr[largest])
+            largest = right;
+
+        // If largest is not root
+        if (largest != i) {
+            int swap = arr[i];
+            arr[i] = arr[largest];
+            arr[largest] = swap;
+
+            // Recursively heapify the affected sub-tree
+            heapify(arr, n, largest);
+        }
+    }
+
+    public static void heapSort(int[] arr) {
+        int n = arr.length;
+
+        // Build heap (rearrange array)
+        for (int i = n / 2 - 1; i >= 0; i--)
+            heapify(arr, n, i);
+
+        // One by one extract an element from heap
+        for (int i = n - 1; i > 0; i--) {
+            // Move current root to end
+            int temp = arr[0];
+            arr[0] = arr[i];
+            arr[i] = temp;
+
+            // Call max heapify on the reduced heap
+            heapify(arr, i, 0);
+        }
+    }
+
+    public static void shellSort(int[] arr) {
+        int n = arr.length;
+
+        // Start with a large gap, then reduce the gap
+        for (int gap = n / 2; gap > 0; gap /= 2) {
+            // Perform insertion sort on elements gapped by 'gap'
+            for (int i = gap; i < n; i++) {
+                int temp = arr[i];
+                int j;
+
+                for (j = i; j >= gap && arr[j - gap] > temp; j -= gap)
+                    arr[j] = arr[j - gap];
+
+                arr[j] = temp;
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        int[] arr = {9, 5, 2, 7, 1, 8, 3, 6, 4};
+
+        System.out.println("Original array: " + Arrays.toString(arr));
+
+        shellSort(arr);
+        System.out.println("Array after shell sort: " + Arrays.toString(arr));
+
+        heapSort(arr);
+        System.out.println("Array after heap sort: " + Arrays.toString(arr));
+    }
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+practical 12
+
+
+```/*****Exp 12 ****/
+//Java program demonstrate a concept inteface and packages.Use customized interface and packages
+
+
+import java.util.*;
+interface tenth
+{
+    float percent = 82.00f;
+    int year = 2019;
+}
+interface twelve
+{
+    float percentage = 88.00f;
+    int years = 2021;
+}
+class data implements tenth,twelve
+{
+    private String name;
+            int age;
+            int pyear = 2023;
+    public 
+            Scanner obj = new Scanner(System.in);
+            void data0()
+            {
+                System.out.println("Enter name :");
+                name = obj.nextLine();
+                System.out.println("Enter age :");
+                age = obj.nextInt(); 
+
+                System.out.println("Candidate Name       :"+name);
+                System.out.println("          Age        :"+age);
+                System.out.println("          PresentYear:"+pyear);
+            }
+            void data1()
+            {
+                System.out.println("*****10th Result Data*****");
+                System.out.println("          Percentage :"+percent);
+                System.out.println("          Year       :"+year);
+
+            }
+            void data2()
+            {
+                System.out.println("*****12th Result Data*****");
+                System.out.println("          Percentage :"+percentage);
+                System.out.println("          Year       :"+years);
+            }
+}
+class interface_package
+{
+    public static void main(String args[])
+    {
+        data obj = new data();
+        obj.data0();
+        obj.data1();
+        obj.data2();
+    }
+}
+
+/*********OUTPUT ********
+Enter name :
+JHON DOE
+Enter age :
+20
+Candidate Name       :JHON DOE
+          Age        :20  
+          PresentYear:2023
+*****10th Result Data*****
+          Percentage :82.0
+          Year       :2019
+*****12th Result Data*****
+          Percentage :88.0
+          Year       :2021
+ */
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+practical 13
+
+/*Exp 12
+Write a java prgm which will demonstrate a concept of cohesion and coupling of various modules*/
+
+class Calculator {
+    public int add(int a, int b) {
+        return a + b;
+    }
+  
+    public int multiply(int a, int b) {
+        return a * b;
+    }
+  
+    public int divide(int a, int b) {
+        return a / b;
+    }
+}
+  
+class User {
+    public static void main(String[] args) {
+        Calculator calculator = new Calculator();
+        
+        int result1 = calculator.add(5, 3);
+        System.out.println("Addition: " + result1);
+        
+        int result2 = calculator.multiply(4, 2);
+        System.out.println("Multiplication: " + result2);
+        
+        int result3 = calculator.divide(10, 2);
+        System.out.println("Division: " + result3);
+    }
+}
+
+
+
+/*In this program, we have two classes: Calculator and User. The Calculator class has three methods: add, multiply, and divide. These methods perform basic arithmetic operations. The User class is responsible for using the Calculator class to perform calculations.
+
+Cohesion refers to the measure of how closely the methods and data of a class are related to each other. In this program, the Calculator class exhibits high cohesion because all of its methods are related to performing calculations. Each method has a single responsibility: adding, multiplying, or dividing. The methods and data within the Calculator class are focused on a common purpose.
+
+Coupling, on the other hand, refers to the interdependencies between classes or modules. In this program, the User class depends on the Calculator class to perform calculations. The User class creates an instance of the Calculator class and uses its methods to perform operations. However, the Calculator class does not depend on the User class. This loose coupling between the classes allows for easier maintenance and future changes.*/
+
+
+
+
