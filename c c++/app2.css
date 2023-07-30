@@ -1,0 +1,31 @@
+h1 {
+    text-align: left;
+    width: 100%;
+    text-decoration: underline line-through;
+    letter-spacing: 20px;
+    font-size: 100px;
+    font-family: Impact;
+
+}
+
+p {
+    font-weight: 700;
+
+
+}
+
+a {
+    text-decoration: none;
+}
+
+p {
+    line-height: 2;
+}
+
+#pp {
+    font-weight: 200;
+}
+
+span {
+    color: red;
+}

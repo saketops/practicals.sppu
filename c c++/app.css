@@ -1,0 +1,14 @@
+h2 {
+    color: #5FCCCF;
+    background-color: rgb(25, 0, 0);
+}
+
+button {
+    color: pink;
+    background-color: cyan
+}
+
+p {
+    color: blue;
+    background: gray
+}

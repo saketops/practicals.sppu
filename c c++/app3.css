@@ -1,0 +1,12 @@
+input+button {
+    color: red;
+}
+
+input[type="password"] {
+    color: blue;
+}
+
+p button:hover::first-letter {
+    background-color: rgb(7, 4, 4);
+    color: blueviolet;
+}
